@@ -1,0 +1,38 @@
+<head>
+
+<meta charset="utf-8">
+<link rel='stylesheet' href='form-style.css' type='text/css' />
+
+<style type="text/css" media="screen">
+
+.mail {padding-top: 80px;padding-bottom: 80px;width: 1000px;background : #AAF1F8;color: #000} /* padding-top est l'espace du dessus (80px ici), padding-bottom est l'espace en dessous (100px ici), width est la largeur du style ".mail" (1000px ici), background est la couleur de fond bleu pastel ("#AAF1F8"), color est noir (#000) pour les caractères écrits à l'intérieur du style ".mail" */
+h1{margin:10;}/* C'est la marge qui est au dessus de la balise <h1> utilisé dans le programme */
+h2{margin:0;}/* C'est la marge qui est au dessus de la balise <h2> utilisé dans le programme */
+
+</style>
+
+</head>
+
+<body>
+<center><a href="/"><h1>Retour à l'accueil</h1></a></center>
+<center><h1>FABRICATION DE SOUS-RESEAUX</h1></center>
+<center><table class="mail" valign="bottom">
+	<tr><td><center><h2>Cliquez ci-dessous, sur le nombre de sous-réseaux à fabriquer </h2></center><br><br><br></td></tr>
+	<tr><td><center><h5>...............................................................................................................................................................................................................</h5></center></td></tr>
+	<tr><td><center><button onclick="ssres2();"> 2 sous-réseaux </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="ssres4();"> 4 sous-réseaux </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="ssres8();"> 8 sous-réseaux </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="ssres16();"> 16 sous-réseaux </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="ssres32();"> 32 sous-réseaux </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="ssres2aide();"> 2 sous-réseaux détailler </button></center></td></tr>
+	<tr><td><center><h5>...............................................................................................................................................................................................................</h5></center></td></tr>
+</table></center>
+<center><h4>je suis en train de travailler sur une réecriture de ce programme (pour plus de propreté et de clarté) micuit-cuit</h4></center>
+<center><h6>(Pour toutes remarques contacter : christophe_chemineau@yahoo.fr)</h6></center>
+
+<script>
+function ssres2() {document.location = 'fabricde2ssres.html';}              /*  ............................................................... */
+function ssres4() {document.location = 'fabricde4ssres.html';}              /*  ........... Tous les fichiers appelés dans ce script .......... */
+function ssres8() {document.location = 'fabricde8ssres.html';}              /*  ......... doivent se trouver dans le même dossier que.......... */
+function ssres16() {document.location = 'fabricde16ssres.html';}            /*  .....le fichier actuel "Fabrication de sous réseaux.html" ..... */
+function ssres32() {document.location = 'fabricde32ssres.html';}            /*  ............................................................... */
+function ssres2aide() {document.location = 'fabricdétailléede2ssresenbinaireetdécimal.html';}      /*  ............................................................... */
+</script>
+
+</body>
+</html>

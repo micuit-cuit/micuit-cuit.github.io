@@ -1,0 +1,522 @@
+<html>
+<body>
+
+<head>
+<title>Calculer des sous-réseaux</title>
+  	<style type="text/css" media="screen">
+		td{width: 80px;
+		   border: 2px solid black;
+		   padding: 0px 0px;
+		   font-size: 12px;
+		  }
+		table{border-collapse: collapse;
+			 }
+		.ligne-rouge{background-color: #ff0000;
+					}
+		.ligne-rose{background-color: #ff6347;
+				   }
+		.ligne-bleue{background-color: #0000FF;
+					}
+		.ligne-bleueclaire{background-color: #1e90ff;
+						  }
+		.ligne-grise{background-color: #C0C0C0;
+					}
+    </style>
+</head>
+
+<h1>Fabrication de 8 sous-réseaux, et affichage des 32 IP des 8 sous-réseaux, en rentrant simplement l'Ip et le masque à l'aide des 5 menus déroulants suivants :</h1>
+
+<form id="formulaire">
+		<p>
+		<select id="Octet1"><option value="0">Octet1</option></select> . <select id="Octet2"><option value="0">Octet2</option></select> . <select id="Octet3"><option value="0">Octet3</option></select> . <select id="Octet4"><option value="0">Octet4</option></select>  / <select id="Masque"><option value="0">Masque</option></select>
+		</p>
+</form>
+
+<button onclick="myFunction1()">Cliquez, pour afficher ci-dessous, le nouveau masque et les 32 @IP des 8 sous-réseaux : </button>
+		<p id="nouveau_masque"></p>
+
+<table class="type1">
+        <tbody>
+              <tr class="ligne-grise"> <td align="center"> ss-réseau </td> <td align="center"> 1er </td> <td align="center"> 2ème </td> <td align="center"> 3ème </td> <td align="center"> 4ème </td> <td align="center"> 5ème </td> <td align="center"> 6ème </td> <td align="center"> 7ème </td> <td align="center"> 8ème </td> </tr> 
+              <tr class="ligne-rose"> <td align="right"> @ss-rés : </td> <td class="ligne-rouge"> <p id="ssres10"></p> </td> <td class="ligne-rouge"> <p id="ssres20"></p> </td> <td class="ligne-rouge"> <p id="ssres30"></p> </td> <td class="ligne-rouge"> <p id="ssres40"></p> </td> <td class="ligne-rouge"> <p id="ssres50"></p> </td> <td class="ligne-rouge"> <p id="ssres60"></p> </td> <td class="ligne-rouge"> <p id="ssres70"></p> </td> <td class="ligne-rouge"> <p id="ssres80"></p> </td> </tr> 
+              <tr class="ligne-bleueclaire"> <td align="right"> First IP : </td> <td class="ligne-bleue"> <p id="ssres11"></p> </td> <td class="ligne-bleue"> <p id="ssres21"></p> </td> <td class="ligne-bleue"> <p id="ssres31"></p> </td> <td class="ligne-bleue"> <p id="ssres41"></p> </td> <td class="ligne-bleue"> <p id="ssres51"></p> </td> <td class="ligne-bleue"> <p id="ssres61"></p> </td> <td class="ligne-bleue"> <p id="ssres71"></p> </td> <td class="ligne-bleue"> <p id="ssres81"></p> </td> </tr>
+              <tr class="ligne-bleueclaire"> <td align="right"> Last IP : </td> <td class="ligne-bleue"> <p id="ssres12"></p> </td> <td class="ligne-bleue"> <p id="ssres22"></p> </td> <td class="ligne-bleue"> <p id="ssres32"></p> </td> <td class="ligne-bleue"> <p id="ssres42"></p> </td> <td class="ligne-bleue"> <p id="ssres52"></p> </td> <td class="ligne-bleue"> <p id="ssres62"></p> </td> <td class="ligne-bleue"> <p id="ssres72"></p> </td> <td class="ligne-bleue"> <p id="ssres82"></p> </td> </tr>
+              <tr class="ligne-rose"> <td align="right"> Broadcast : </td> <td class="ligne-rouge"> <p id="ssres13"></p> </td> <td class="ligne-rouge"> <p id="ssres23"></p> </td> <td class="ligne-rouge"> <p id="ssres33"></p> </td> <td class="ligne-rouge"> <p id="ssres43"></p> </td> <td class="ligne-rouge"> <p id="ssres53"></p> </td> <td class="ligne-rouge"> <p id="ssres63"></p> </td> <td class="ligne-rouge"> <p id="ssres73"></p> </td> <td class="ligne-rouge"> <p id="ssres83"></p> </td> </tr>
+        </tbody>
+</table>
+<center><h6>(Pour toutes remarques contacter : christophe_chemineau@yahoo.fr)</h6></center>
+
+<script type="text/javascript">
+var octet = 0;
+for (var i=0 ; i <= 255 ; i++)
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Octet1').options[i] = monOption;
+	}
+</script>
+
+<script type="text/javascript">
+var octet = 0;
+for (var i=0 ; i <= 255 ; i++)
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Octet2').options[i] = monOption;
+	}
+</script>
+
+<script type="text/javascript">
+var octet = 0;
+for (var i=0 ; i <= 255 ; i++)
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Octet3').options[i] = monOption;
+	}
+</script>
+
+<script type="text/javascript">
+var octet = 0;
+for (var i=0 ; i <= 255 ; i++)
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Octet4').options[i] = monOption;
+	}
+</script>
+
+<script type="text/javascript">
+var octet = 0;
+for (var i=0 ; i <= 27 ; i++)
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Masque').options[i] = monOption;
+	}
+</script>
+
+<script>
+function myFunction1(){
+	var p = (document.forms.formulaire.Octet1. options.selectedIndex);
+	resp=[]
+	var d = (document.forms.formulaire.Octet2. options.selectedIndex);
+	resd=[]
+	var t = (document.forms.formulaire.Octet3. options.selectedIndex);
+	rest=[]
+	var q = (document.forms.formulaire.Octet4. options.selectedIndex);
+	var s = (document.forms.formulaire.Masque. options.selectedIndex);
+
+	w = (+s+3);                // Ancien CIDR + 1
+   	document.getElementById("nouveau_masque").innerHTML = ("Le nouveau masque de sous-réseau devient :      /"+w);
+
+	resq=[]
+	for (i=0;i<8;i++){      // pour faire la boucle 8 fois pour avoir les 8 bits de l'octet
+   		 resp.push(p % 2);   // le reste de la division du premier octet par 2 est rajouté dans le tableau resp
+   		 p = Math.floor(p / 2);  // la valeur entière de la division du premier octet par 2
+	}
+	resp.reverse();          // On remet le premier octet dans le bon ordre
+  	for (i=0;i<8;i++){      // pour faire la boucle 8 fois pour avoir les 8 bits de l'octet
+   		 resd.push(d % 2);   // le reste de la division du premier octet par 2 est rajouté dans le tableau resp
+   		 d = Math.floor(d / 2);  // la valeur entière de la division du premier octet par 2
+	}
+	resd.reverse();          // On remet le premier octet dans le bon ordre
+	for (i=0;i<8;i++){      // pour faire la boucle 8 fois pour avoir les 8 bits de l'octet
+   		 rest.push(t % 2);   // le reste de la division du premier octet par 2 est rajouté dans le tableau resp
+   		 t = Math.floor(t / 2);  // la valeur entière de la division du premier octet par 2
+	}
+	rest.reverse();          // On remet le premier octet dans le bon ordre
+	for (i=0;i<8;i++){      // pour faire la boucle 8 fois pour avoir les 8 bits de l'octet
+   		 resq.push(q % 2);   // le reste de la division du premier octet par 2 est rajouté dans le tableau resp
+   		 q = Math.floor(q / 2);  // la valeur entière de la division du premier octet par 2
+	}
+	resq.reverse();          // On remet le premier octet dans le bon ordre
+	resp=resp.concat(resd);
+	resp=resp.concat(rest);
+	resp=resp.concat(resq);
+ 	var s = (document.forms.formulaire.Masque. options.selectedIndex);
+	var k=0;                 // Initialisation du premier octet 
+	var l=0;                 // Initialisation du deuxième octet
+	var r=0;                 // Initialisation du troisième octet
+	var u=0;                 // Initialisation du quatrième octet
+	var j=0;
+
+	resp[s]=0;
+	resp[s+1]=0;
+	resp[s+2]=0;
+	for (j=s+3;j<32;j++){resp[j]=0;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres10").innerHTML = (k+"."+l+"."+r+"."+u);
+	
+	resp[s]=0;
+	resp[s+1]=0;
+	resp[s+2]=0;
+	for (j=s+3;j<31;j++){resp[j]=0;
+						}
+	resp[31]=1;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres11").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=0;
+	resp[s+2]=0;
+	for (j=s+3;j<31;j++){resp[j]=1;
+						}
+	resp[31]=0;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres12").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=0;
+	resp[s+2]=0;
+	for (j=s+3;j<32;j++){resp[j]=1;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres13").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=0;
+	resp[s+2]=1;
+	for (j=s+3;j<32;j++){resp[j]=0;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres20").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=0;
+	resp[s+2]=1;
+	for (j=s+3;j<31;j++){resp[j]=0;
+						}
+	resp[31]=1;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres21").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=0;
+	resp[s+2]=1;
+	for (j=s+3;j<31;j++){resp[j]=1;
+						}
+	resp[31]=0;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres22").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=0;
+	resp[s+2]=1;
+	for (j=s+3;j<32;j++){resp[j]=1;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres23").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=1;
+	resp[s+2]=0;
+	for (j=s+3;j<32;j++){resp[j]=0;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres30").innerHTML = (k+"."+l+"."+r+"."+u);
+	
+	resp[s]=0;
+	resp[s+1]=1;
+	resp[s+2]=0;
+	for (j=s+3;j<31;j++){resp[j]=0;
+						}
+	resp[31]=1;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres31").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=1;
+	resp[s+2]=0;
+	for (j=s+3;j<31;j++){resp[j]=1;
+						}
+	resp[31]=0;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres32").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=1;
+	resp[s+2]=0;
+	for (j=s+3;j<32;j++){resp[j]=1;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres33").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=1;
+	resp[s+2]=1;
+	for (j=s+3;j<32;j++){resp[j]=0;
+							}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres40").innerHTML = (k+"."+l+"."+r+"."+u);
+	
+	resp[s]=0;
+	resp[s+1]=1;
+	resp[s+2]=1;
+	for (j=s+3;j<31;j++){resp[j]=0;
+						}
+	resp[31]=1;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres41").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=1;
+	resp[s+2]=1;
+	for (j=s+3;j<31;j++){resp[j]=1;
+						}
+	resp[31]=0;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres42").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;
+	resp[s+1]=1;
+	resp[s+2]=1;
+	for (j=s+3;j<32;j++){resp[j]=1;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres43").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=0;
+	resp[s+2]=0;
+	for (j=s+3;j<32;j++){resp[j]=0;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres50").innerHTML = (k+"."+l+"."+r+"."+u);
+
+
+	resp[s]=1;
+	resp[s+1]=0;
+	resp[s+2]=0;
+	for (j=s+3;j<31;j++){ resp[j]=0;
+						}
+	resp[31]=1;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres51").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=0;
+	resp[s+2]=0;
+	for (j=s+3;j<31;j++){resp[j]=1;
+						}
+	resp[31]=0;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres52").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=0;
+	resp[s+2]=0;
+	for (j=s+3;j<32;j++){resp[j]=1;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres53").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=0;
+	resp[s+2]=1;
+	for (j=s+3;j<32;j++){resp[j]=0;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres60").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=0;
+	resp[s+2]=1;
+	for (j=s+3;j<31;j++){resp[j]=0;
+						}
+	resp[31]=1;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres61").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=0;
+	resp[s+2]=1;
+	for (j=s+3;j<31;j++){resp[j]=1;
+						}
+	resp[31]=0;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres62").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=0;
+	resp[s+2]=1;
+	for (j=s+3;j<32;j++){resp[j]=1;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres63").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=1;
+	resp[s+2]=0;
+	for (j=s+3;j<32;j++){resp[j]=0;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres70").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=1;
+	resp[s+2]=0;
+	for (j=s+3;j<31;j++){resp[j]=0;
+						}
+	resp[31]=1;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres71").innerHTML = (k+"."+l+"."+r+"."+u);
+	
+	resp[s]=1;
+	resp[s+1]=1;
+	resp[s+2]=0;
+	for (j=s+3;j<31;j++){resp[j]=1;
+						}
+	resp[31]=0;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres72").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=1;
+	resp[s+2]=0;
+	for (j=s+3;j<32;j++){resp[j]=1;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres73").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=1;
+	resp[s+2]=1;
+	for (j=s+3;j<32;j++){resp[j]=0;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres80").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=1;
+	resp[s+2]=1;
+	for (j=s+3;j<31;j++){resp[j]=0;
+						}
+	resp[31]=1;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres81").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=1;
+	resp[s+2]=1;
+	for (j=s+3;j<31;j++){resp[j]=1;
+						}
+	resp[31]=0;
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres82").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;
+	resp[s+1]=1;
+	resp[s+2]=1;
+	for (j=s+3;j<32;j++){resp[j]=1;
+						}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres83").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	}
+</script>
+
+</body>
+</html>

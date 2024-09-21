@@ -1,0 +1,266 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	</head>
+<body>
+<head>
+	<title>Calculer des sous-réseaux</title>
+ 	<style type="text/css" media="screen">
+		td{
+  		  width: 80px;
+  		  border: 2px solid black;
+  		  padding: 0px 0px;
+ 		  font-size: 12px;
+  		  }
+		table{
+ 		  border-collapse: collapse;
+    	  }
+		.ligne-rouge{
+ 		   background-color: #ff0000;
+		   }
+		.ligne-rose{
+    	   background-color: #ff6347;
+    	   }
+		.ligne-bleue{
+   		   background-color: #0000FF;
+  		   }
+		.ligne-bleueclaire{
+   		   background-color: #1e90ff;
+   		   }
+		.ligne-grise{
+   		   background-color: #C0C0C0;
+   		   }
+    </style>
+</head>
+
+<h1>Fabrication de 2 sous-réseaux, et affichage des 8 adresses des 2 sous-réseaux, en rentrant simplement l'Ip et le masque é l'aide des 5 menus déroulants suivants :</h1>
+
+<form id="formulaire">                           
+		<select id="Octet1">
+			<option value="0">Octet1</option>    // Menu déroulant de l'Octet1 avec la valeur 0 par défaut
+		</select>
+		.                                        
+		<select id="Octet2"
+			<option value="0">Octet2</option>    // Menu déroulant de l'Octet2 avec la valeur 0 par défaut
+		</select>
+		.                                        
+		<select id="Octet3">
+			<option value="0">Octet3</option>    // Menu déroulant de l'Octet3 avec la valeur 0 par défaut
+		</select>
+		.                                       
+		<select id="Octet4">
+			<option value="0">Octet4</option>    // Menu déroulant de l'Octet4 avec la valeur 0 par défaut
+		</select>
+		/                                       
+		<select id="Masque">
+			<option value="0">Masque</option>    // Menu déroulant du Masque en notation CIDR avec la valeur 0 par défaut
+		</select>	
+</form>
+
+<button onclick="myFunction1()">Cliquez, pour afficher ci-dessous, le nouveau masque et les 8 @IP des 2 sous-réseaux : </button>
+		<p id="nouveau_masque"></p>
+
+<table class="type1">
+        <tbody>
+              <tr class="ligne-grise"> <td align="center"> ss-réseau </td> <td align="center"> 1er </td> <td align="center"> 2éme </td> </tr> 
+              <tr class="ligne-rose"> <td align="right"> @ss-rés : </td> <td class="ligne-rouge"> <p id="ssres10"></p> </td> <td class="ligne-rouge"> <p id="ssres20"></p> </td> </tr> 
+              <tr class="ligne-bleueclaire"> <td align="right"> First IP : </td> <td class="ligne-bleue"> <p id="ssres11"></p> </td> <td class="ligne-bleue"> <p id="ssres21"></p> </td> </tr>
+              <tr class="ligne-bleueclaire"> <td align="right"> Last IP : </td> <td class="ligne-bleue"> <p id="ssres12"></p> </td> <td class="ligne-bleue"> <p id="ssres22"></p> </td> </tr>
+              <tr class="ligne-rose"> <td align="right"> Broadcast : </td> <td class="ligne-rouge"> <p id="ssres13"></p> </td> <td class="ligne-rouge"> <p id="ssres23"></p> </td> </tr>
+        </tbody>
+</table>
+<center><h6>(Pour toutes remarques contacter : christophe_chemineau@yahoo.fr)</h6></center>
+
+<script type="text/javascript">             //Création du menu déroulant pour l'octet 1, qui prendra des valeurs comprises entre 0 et 255
+var octet = 0;
+for (var i=0 ; i <= 255 ; i++)
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Octet1').options[i] = monOption;
+	}
+</script>
+
+<script type="text/javascript">             //Création du menu déroulant pour l'octet 2, qui prendra des valeurs comprises entre 0 et 255
+var octet = 0;
+for (var i=0 ; i <= 255 ; i++)
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Octet2').options[i] = monOption;
+	}
+</script>
+
+<script type="text/javascript">             //Création du menu déroulant pour l'octet 3, qui prendra des valeurs comprises entre 0 et 255
+var octet = 0;
+for (var i=0 ; i <= 255 ; i++)
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Octet3').options[i] = monOption;
+	}
+</script>
+
+<script type="text/javascript">             //Création du menu déroulant pour l'octet 4, qui prendra des valeurs comprises entre 0 et 255
+var octet = 0;
+for (var i=0 ; i <= 255 ; i++)
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Octet4').options[i] = monOption;
+	}
+</script>
+
+<script type="text/javascript">             //Création du menu déroulant pour le masque de sous-réseau en notation CIDR, qui prendra des valeurs comprises entre 0 et 29
+var octet = 0;
+for (var i=0 ; i <= 29 ; i++)               //Le masque est Limité é /29 car pour pouvoir fabriquer 2 sous réseaux, il faut garder au moins 3 bits !
+	{
+	var monOption = document.createElement('option');
+	monOption.text = octet + i;
+	monOption.value = octet + i;
+	document.getElementById('Masque').options[i] = monOption;
+	}
+</script>
+
+<script>
+function myFunction1(){
+	var p = (document.forms.formulaire.Octet1. options.selectedIndex);    //La valeur sélectionnée pour l'octet 1 est sauvegardée dans la variable "p"
+	resp=[];															  //Création du tableau "resp"
+	var d = (document.forms.formulaire.Octet2. options.selectedIndex);    //La valeur sélectionnée pour l'octet 2 est sauvegardée dans la variable "d"
+	resd=[];															  //Création du tableau "resd"
+	var t = (document.forms.formulaire.Octet3. options.selectedIndex);    //La valeur sélectionnée pour l'octet 3 est sauvegardée dans la variable "t"
+	rest=[];															  //Création du tableau "rest"
+	var q = (document.forms.formulaire.Octet4. options.selectedIndex);    //La valeur sélectionnée pour l'octet 4 est sauvegardée dans la variable "q"
+	resq=[];															  //Création du tableau "resq"
+    var s = (document.forms.formulaire.Masque. options.selectedIndex);    //La valeur sélectionnée pour le masque CIDR est sauvegardée dans la variable "s"
+
+	w = (+s+1);                // (Ancien CIDR + 1) sauvagardée dans "w"
+   	document.getElementById("nouveau_masque").innerHTML = ("Le nouveau masque de sous-réseau devient :      /"+w);
+
+	for (i=0;i<8;i++){      // pour faire la boucle 8 fois pour avoir les 8 bits de l'octet
+   		 resp.push(p % 2);   // le reste de la division du premier octet par 2 est rajouté dans le tableau resp
+   		 p = Math.floor(p / 2);  // la valeur entiére de la division du premier octet par 2
+	}
+	resp.reverse();          // On remet le premier octet dans le bon ordre
+
+  	for (i=0;i<8;i++){      // pour faire la boucle 8 fois pour avoir les 8 bits de l'octet
+   		 resd.push(d % 2);   // le reste de la division du deuxiéme octet par 2 est rajouté dans le tableau resd
+   		 d = Math.floor(d / 2);  // la valeur entiére de la division du deuxiéme octet par 2
+	}
+	resd.reverse();          // On remet le deuxiéme octet dans le bon ordre
+
+	for (i=0;i<8;i++){      // pour faire la boucle 8 fois pour avoir les 8 bits de l'octet
+   		 rest.push(t % 2);   // le reste de la division du troisiéme octet par 2 est rajouté dans le tableau rest
+   		 t = Math.floor(t / 2);  // la valeur entiére de la division du troisiéme octet par 2
+	}
+	rest.reverse();          // On remet le troisiéme octet dans le bon ordre
+
+	for (i=0;i<8;i++){      // pour faire la boucle 8 fois pour avoir les 8 bits de l'octet
+   		 resq.push(q % 2);   // le reste de la division du troisiéme octet par 2 est rajouté dans le tableau resq
+   		 q = Math.floor(q / 2);  // la valeur entiére de la division du troisiéme octet par 2
+	}
+	resq.reverse();          // On remet le quatriéme octet dans le bon ordre
+
+	resp=resp.concat(resd);  //le tableau resd est concaténé avec resp pour étre mis dans le nouveau resp
+	resp=resp.concat(rest);  //le tableau rest est concaténé avec le nouveau resp pour étre mis dans un nouveau resp
+	resp=resp.concat(resq);  //le dernier tableau resq est concaténé avec le dernier nouveau resp pour étre mis dans un dernier resp (qui regroupe les 32 bits)
+
+ 	var k=0;                 // Initialisation du premier octet 
+	var l=0;                 // Initialisation du deuxiéme octet
+	var r=0;                 // Initialisation du troisiéme octet
+	var u=0;                 // Initialisation du quatriéme octet
+	var j=0;
+
+	resp[s]=0;               //Le bit correspondant aux sous-réseaux, prend d'abord la valeur 0 pour coder le premier sous-réseau
+	for (j=s+1;j<32;j++){
+    resp[j]=0;               //Tous les bits hétes sont é 0 (c'est l'adresse IP du premier sous-réseau)
+	}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);         //Conversion binaire-décimale des 8 premiers bits, le résultat ("k") devient l'octet 1 
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);   //Conversion binaire-décimale des 8 bits suivants, le résultat ("l") devient l'octet 2 
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]); //Conversion binaire-décimale des 8 bits suivants, le résultat ("r") devient l'octet 3 
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]); //Conversion binaire-décimale des 8 derniers bits, le résultat ("u") devient l'octet 4 
+	document.getElementById("ssres10").innerHTML = (k+"."+l+"."+r+"."+u);        // mémorisation de l'IP du premier sous-réseau "pointée" avec les 4 octets trouvés, sous le nom "ssres10"
+
+	resp[s]=0;               //Le bit correspondant aux sous-réseaux, prend d'abord la valeur 0 pour coder le premier sous-réseau
+	for (j=s+1;j<31;j++){
+    resp[j]=0;               //Tous les bits hétes (sauf le dernier) sont é 0 (c'est la premiére adresse IP disponible du premier sous-réseau)
+	}
+	resp[31]=1;              //Le dernier bit, prend la valeur 1 pour coder la premiére IP du premier sous-réseau
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres11").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;               //Le bit correspondant aux sous-réseaux, prend d'abord la valeur 0 pour coder le premier sous-réseau
+	for (j=s+1;j<31;j++){
+  	resp[j]=1;               //Tous les bits hétes (sauf le dernier) sont é 1 (c'est la derniére adresse IP disponibe du premier sous-réseau)
+	}
+	resp[31]=0;              //Le dernier bit, prend la valeur 0 pour coder la derniére IP disponible du premier sous-réseau
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres12").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=0;              //Le bit correspondant aux sous-réseaux, prend d'abord la valeur 0 pour coder le premier sous-réseau
+	for (j=s+1;j<32;j++){
+ 	resp[j]=1;              //Tous les bits hétes sont é 1 (c'est le Broadcast du premier sous-réseau)
+	}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres13").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;              //Le bit correspondant aux sous-réseaux, prend d'abord la valeur 1 pour coder le second sous-réseau
+	for (j=s+1;j<32;j++){
+    resp[j]=0;              //Tous les bits hétes sont é 0 (c'est l'adresse IP du second sous-réseau)
+	}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres20").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;               //Le bit correspondant aux sous-réseaux, prend d'abord la valeur 1 pour coder le second sous-réseau
+	for (j=s+1;j<31;j++){
+    resp[j]=0;               //Tous les bits hétes (sauf le dernier) sont é 0 (c'est la premiére adresse IP disponible du second sous-réseau)
+	}
+	resp[31]=1;              //Le dernier bit, prend la valeur 1 pour coder la premiére IP du second sous-réseau
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres21").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;              //Le bit correspondant aux sous-réseaux, prend d'abord la valeur 1 pour coder le second sous-réseau
+	for (j=s+1;j<31;j++){
+  	resp[j]=1;              //Tous les bits hétes (sauf le dernier) sont é 1 (c'est la derniére adresse IP disponible du second sous-réseau)
+	}
+	resp[31]=0;             //Le dernier bit, prend la valeur 0 pour coder la derniére IP disponible du second sous-réseau
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres22").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	resp[s]=1;              //Le bit correspondant aux sous-réseaux, prend d'abord la valeur 1 pour coder le second sous-réseau
+	for (j=s+1;j<32;j++){
+ 	resp[j]=1;              //Tous les bits hétes sont é 1 (c'est le Broadcast du second sous-réseau)
+	}
+	k=(128*resp[0]+64*resp[1]+32*resp[2]+16*resp[3]+8*resp[4]+4*resp[5]+2*resp[6]+resp[7]);
+	l=(128*resp[8]+64*resp[9]+32*resp[10]+16*resp[11]+8*resp[12]+4*resp[13]+2*resp[14]+resp[15]);
+	r=(128*resp[16]+64*resp[17]+32*resp[18]+16*resp[19]+8*resp[20]+4*resp[21]+2*resp[22]+resp[23]);
+	u=(128*resp[24]+64*resp[25]+32*resp[26]+16*resp[27]+8*resp[28]+4*resp[29]+2*resp[30]+resp[31]);
+	document.getElementById("ssres23").innerHTML = (k+"."+l+"."+r+"."+u);
+
+	}
+</script>
+
+</body>
+</html>
