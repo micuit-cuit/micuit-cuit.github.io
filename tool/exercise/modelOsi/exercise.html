@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>exercice sur le modèle OSI</title>
+    <script src="/js/lib/alert.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -222,6 +224,7 @@
                     const scoreDiv = document.createElement("div")
                     scoreDiv.className = "score"
                     scoreDiv.innerHTML = `<p>vous avez obtenu ${score}/20</p>`
+                    alerte("vous avez obtenu " + score + "/20")
                     document.getElementById("exercise1").appendChild(scoreDiv)
                     const resetDiv = document.createElement("button")
                     resetDiv.innerHTML = "Réessayer"
