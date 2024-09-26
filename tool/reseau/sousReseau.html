@@ -169,11 +169,12 @@
     let subnets = [];
 
     document.querySelector('#create').addEventListener('click', function() {
+        subnets = [];
         let ipPart = document.getElementById('ip').value;
         let nb = document.getElementById('nb').value;
         console.log(ipPart, nb);
         //verifie l'entrée utilisateur
-        if (!ipPart) {
+        if (!ipPart) {sousReseauEasy
             alert('Veuillez entrer une adresse IP et un masque (ex: 10.0.0.1/8)');
             return;
         }
