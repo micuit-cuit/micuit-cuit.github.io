@@ -113,6 +113,21 @@
     <div class="container">
         <a href="/tool/reseau/index.html">retour au outils réseau</a>
         <h1>Configurateur de VLAN</h1>
+        <label for="marque" id="labelMarque" >Marque de l'équipement :</label>
+        <select id="marque" name="marque">
+            <option value="Cisco">Cisco</option>
+            <option value="HP">HP</option>
+        </select>
+        <script>
+            //si l'url contien beta, affiche labelMarque et marque
+            if (window.location.href.includes('beta')) {
+                document.getElementById('labelMarque').style.display = 'block'
+                document.getElementById('marque').style.display = 'block'
+            }else{
+                document.getElementById('labelMarque').style.display = 'none'
+                document.getElementById('marque').style.display = 'none'
+            }
+        </script>
         <div id="vlanDiv">
   
         </div>
@@ -126,78 +141,117 @@
 </div>
 
     <script>
+
+
         let vlanID = []
         document.getElementById('generate').addEventListener('click', function(event) {
             console.log('click')
             let commandOutput = document.getElementById('commandOutput')
             let commande = `<div id="ctrlC"><button onclick="copyToClipboard()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M384 336l-192 0c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l140.1 0L400 115.9 400 320c0 8.8-7.2 16-16 16zM192 384l192 0c35.3 0 64-28.7 64-64l0-204.1c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1L192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-32-48 0 0 32c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l32 0 0-48-32 0z"/></svg>Copier la commande</button></div>
-vlan database
-            `
+`
             //pour chaque vlan
+            let marque = document.getElementById("marque")?.value || "HP"; // "Cisco" ou "HP"
+
+            commande += marque === "Cisco" ? "vlan database\n" : marque === "HP" ? "\nenable\nconfigure\n" : ""
+
             for (let i = 0; i < vlanID.length; i++) {
-                let vlanId = document.getElementById(`vlanId-${i}`).value
-                let vlanName = document.getElementById(`vlanName-${i}`).value
-                //supprime les espaces
-                if (vlanName.includes(' '))
-                    alert('Le nom du VLAN ' + vlanId + ' contient des espaces, il seront automatiquement supprimés')
-                vlanName = vlanName.replace(/\s/g, '')
+            let vlanId = document.getElementById(`vlanId-${i}`).value;
+            let vlanName = document.getElementById(`vlanName-${i}`).value;
+
+            // Supprime les espaces dans le nom du VLAN
+            if (vlanName.includes(" ")) {
+                alert(`Le nom du VLAN ${vlanId} contient des espaces, ils seront automatiquement supprimés.`);
+                vlanName = vlanName.replace(/\s/g, "");
+            }
+
+            if (marque === "Cisco") {
                 commande += `
     vlan ${vlanId} name ${vlanName}
-                `
-            }
-            commande += `
-exit
-configure terminal
-            `
-            let vlanIDConflic = []
-            for (let i = 0; i < vlanID.length; i++) {
-                let vlanId = document.getElementById(`vlanId-${i}`).value
-              
-                let typePort = document.getElementById(`typePort-${i}`).value
-                let vlanRangeFrom = document.getElementById(`vlanRange-${i}-from`).value
-                let vlanRangeTo = document.getElementById(`vlanRange-${i}-to`).value || vlanRangeFrom
-                // si un des champs est vide
-                if (!vlanId || !typePort || !vlanRangeFrom || !vlanRangeTo) {
-                    alert('Veuillez remplir tous les champs')
-                    return
-                }
-                //verifie si la plage de port est deja utilisé ou si l'ID du vlan est deja utilisé
-                if (vlanIDConflic.some(vlan => vlan.vlanId == vlanId)) {
-                    alert('Le VLAN ' + vlanId + ' est déjà utilisé')
-                    return
-                }
-                if (vlanIDConflic.some(vlan => vlan.vlanRangeFrom <= vlanRangeFrom && vlan.vlanRangeTo >= vlanRangeFrom)) {
-                    alert('La plage de port pour le VLAN ' + vlanId + ' est en conflit avec un autre VLAN')
-                    return
-                }
-                vlanIDConflic.push({vlanId, vlanRangeFrom, vlanRangeTo})
-                //test si la plage de port est de 1 port ou plus et que for est plus petit que to
-                if (vlanRangeFrom > vlanRangeTo) {
-                    alert('La plage de port pour le VLAN ' + vlanId + ' est incorrecte')
-                    return
-                }
-                if (vlanRangeFrom == vlanRangeTo) {
-                    commande += `
-    interface ${typePort}${vlanRangeFrom}
-        switchport mode access
-        switchport access vlan ${vlanId}
-    exit
-                    `
-                    continue
-                }
+`;
+            } else if (marque === "HP") {
                 commande += `
-    interface range ${typePort}${vlanRangeFrom} - ${vlanRangeTo}
-        switchport mode access
-        switchport access vlan ${vlanId}
+    vlan ${vlanId}
+        name "${vlanName}"
     exit
-                `
+`;
             }
+        }
+
+        commande += `
+${marque === "Cisco" ? "exit \nconfigure terminal" : ""}
+        `;
+
+        let vlanIDConflic = [];
+        for (let i = 0; i < vlanID.length; i++) {
+            let vlanId = document.getElementById(`vlanId-${i}`).value;
+            let typePort = document.getElementById(`typePort-${i}`).value;
+            let vlanRangeFrom = document.getElementById(`vlanRange-${i}-from`).value;
+            let vlanRangeTo = document.getElementById(`vlanRange-${i}-to`).value || vlanRangeFrom;
+            let typeTrunk = document.getElementById(`typeTrunk-${i}`).value;
+            let natif = document.getElementById(`natif-${i}`).value;
+            let allowedVlan = document.getElementById(`allowedVlan-${i}`).value;
+
+            // Vérification des champs
+            if (!vlanId || !typePort || !vlanRangeFrom || !vlanRangeTo) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            // Conflit de VLAN ou de plage
+            if (vlanIDConflic.some(vlan => vlan.vlanId == vlanId)) {
+                alert(`Le VLAN ${vlanId} est déjà utilisé.`);
+                return;
+            }
+            if (vlanIDConflic.some(vlan => vlan.vlanRangeFrom <= vlanRangeFrom && vlan.vlanRangeTo >= vlanRangeFrom)) {
+                alert(`La plage de port pour le VLAN ${vlanId} est en conflit avec un autre VLAN.`);
+                return;
+            }
+            vlanIDConflic.push({ vlanId, vlanRangeFrom, vlanRangeTo });
+
+            if (vlanRangeFrom > vlanRangeTo) {
+                alert(`La plage de port pour le VLAN ${vlanId} est incorrecte.`);
+                return;
+            }
+
+            // Configuration des interfaces
+            if (vlanRangeFrom == vlanRangeTo) {
+                commande += `
+    interface ${marque === "Cisco"?typePort:""}${vlanRangeFrom}
+    ${typeTrunk == "Trunk" ? `
+        ${marque === "Cisco" ? "switchport mode trunk" : "trunk"}
+        ${natif && natif != 1 ? `${marque === "Cisco" ? `switchport trunk native vlan ${natif}` : `untagged vlan ${natif}`}` : ""}
+        ${allowedVlan ? `${marque === "Cisco" ? `switchport trunk allowed vlan ${allowedVlan}` : `tagged vlan ${allowedVlan}`}` : ""}
+    ` : `
+        ${marque === "Cisco" ? "switchport mode access" : ""}
+        ${marque === "Cisco" ? `switchport access vlan ${vlanId}` : `untagged vlan ${vlanId}`}
+    `}
+    exit
+`;
+                continue;
+            }
+
             commande += `
+    interface ${marque === "Cisco"?"range "+typePort:""}${vlanRangeFrom}-${vlanRangeTo}
+    ${typeTrunk == "Trunk" ? `
+        ${marque === "Cisco" ? "switchport mode trunk" : "trunk"}
+        ${natif && natif != 1 ? `${marque === "Cisco" ? `switchport trunk native vlan ${natif}` : `untagged vlan ${natif}`}` : ""}
+        ${allowedVlan ? `${marque === "Cisco" ? `switchport trunk allowed vlan ${allowedVlan}` : `tagged vlan ${allowedVlan}`}` : ""}
+` : `
+        ${marque === "Cisco" ? "switchport mode access" : ""}
+        ${marque === "Cisco" ? `switchport access vlan ${vlanId}` : `untagged vlan ${vlanId}`}
+`}
+    exit
+`;
+        }
+
+        commande += `
 exit
-(write memory)
-            `
-            console.log(commande)
-            commandOutput.innerHTML = commande
+${marque === "Cisco" ? "(write memory)" : "write memory"}
+${marque === "Cisco" ? "" : "# ATTENTION : Les commandes ici n'on pas été testées sur un équipement HP, merci de faire des retours si il y a des erreurs."}
+`;
+
+        console.log(commande);
+        commandOutput.innerHTML = commande;
 
         });
         document.getElementById('addVlan').addEventListener('click', creatVlan)
@@ -207,6 +261,7 @@ exit
             addDiv.id = `vlanForm-${vlanID.length}`
             addDiv.className = 'form'
             addDiv.innerHTML = `
+                
                 <div>
                     <label for="vlanId-${vlanID.length}">ID du VLAN :</label>
                     <input type="number" id="vlanId-${vlanID.length}" name="vlanId" required>
@@ -216,18 +271,29 @@ exit
                     <input type="text" id="vlanName-${vlanID.length}" name="vlanName" required>
                 </div>
                 <div>
+                    <label for="typeTrunk-${vlanID.length}">TRUNK ou ACCESS :</label>
+                    <select id="typeTrunk-${vlanID.length}" name="typeTrunk" required>
+                        <option value="Access">Access</option>
+                        <option value="Trunk">Trunk</option>
+                    </select>
                     <label for="typePprt-${vlanID.length}">Type de port :</label>
                     <select id="typePort-${vlanID.length}" name="typePort" required>
                         <option value="FastEthernet0/">FastEthernet0/</option>
                         <option value="GigabitEthernet0/">GigabitEthernet0/</option>
                     </select>
                 <div>
+                <div id="vlanNatif-${vlanID.length}" style="display: none;">
+                    <label for="natif-${vlanID.length}">VLAN natif :</label>
+                    <input type="number" id="natif-${vlanID.length}" name="natif">
+                    <label for="allowedVlan-${vlanID.length}">VLAN autorisés (laissé vide pour tous, mettre les id des vlan séparé par des virgules) :</label>
+                    <input type="text" id="allowedVlan-${vlanID.length}" name="allowedVlan">
+                </div>      
                 <div>
                     <label for="vlanRange-${vlanID.length}">Plage de ports :</label>
                     <input type="number" id="vlanRange-${vlanID.length}-from" name="vlanRange" required>
                     <label for="vlanRange-${vlanID.length}-to">à</label>
                     <input type="number" id="vlanRange-${vlanID.length}-to" name="vlanRange" required>
-                </div>
+                </div>              
                 <div style="display: flex; justify-content: center;">
                     <button class="button removeVlan" id="removeVlan-${vlanID.length}" onclick="removeVlan(${vlanID.length})">Supprimer</button>
                 </div>
@@ -235,6 +301,15 @@ exit
             vlanDiv.appendChild(addDiv)
             document.getElementById(`vlanId-${vlanID.length}`).focus()
             vlanID.push(vlanID.length)
+            //si le vlan est en trunk on affiche le vlan natif
+            document.getElementById(`typeTrunk-${vlanID.length-1}`).addEventListener('change', function(event) {
+                const vlanNatif = document.getElementById(`vlanNatif-${vlanID.length-1}`)
+                if (event.target.value == 'Trunk') {
+                    vlanNatif.style.display = 'block'
+                } else {
+                    vlanNatif.style.display = 'none'
+                }
+            })
         }
         creatVlan()
         function removeVlan(id){
