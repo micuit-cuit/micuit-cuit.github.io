@@ -231,7 +231,7 @@ ${marque === "Cisco" ? "exit \nconfigure terminal" : ""}
             }
 
             commande += `
-    interface ${marque === "Cisco"?"range "+typePort:""}${vlanRangeFrom}-${vlanRangeTo}
+    interface ${marque === "Cisco"?"range "+typePort:""}${vlanRangeFrom} - ${vlanRangeTo}
     ${typeTrunk == "Trunk" ? `
         ${marque === "Cisco" ? "switchport mode trunk" : "trunk"}
         ${natif && natif != 1 ? `${marque === "Cisco" ? `switchport trunk native vlan ${natif}` : `untagged vlan ${natif}`}` : ""}
