@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/lib/alert.js"></script>
+    <title>Pont diviseur de tension</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form {
+            display: flex;
+            flex-direction: column;
+            border: black 1px solid;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 15px;
+        }
+        label {
+            margin: 10px 0 5px;
+            color: #555;
+        }
+        input, select {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            color: #333;
+            font-weight: bold;
+        }
+        #output {
+            margin: 20px 10px;
+            padding: 15px;
+            background-color: #e8f4e8;
+            border-radius: 10px;
+            border: 1px solid #4CAF50;
+        }
+        span.coppy {
+            font-weight: bold;
+            border: 1px solid #383838;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+        span.coppy:hover:before {
+            content: 'Copier';
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            margin-left: 10px;
+            top: -30px;
+            z-index: 10000;
+        }
+        .result-value {
+            font-size: 1.5em;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .schema {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+        .schema pre {
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .info {
+            background-color: #e7f3ff;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/tool/electronique/index.html">Retour aux outils électroniques</a>
+        <h1>Pont diviseur de tension</h1>
+        
+        <div class="info">
+            <strong>Formule :</strong> Vout = Vin × (R2 / (R1 + R2))
+        </div>
+
+        <div class="schema">
+            <pre>
+    Vin ──┬── R1 ──┬── Vout
+          │       │
+          └── R2 ─┴── GND
+            </pre>
+        </div>
+        
+        <div class="form">
+            <label for="mode">Mode de calcul :</label>
+            <select id="mode" name="mode">
+                <option value="vout">Calculer Vout (tension de sortie)</option>
+                <option value="r2">Calculer R2 (résistance)</option>
+                <option value="r1">Calculer R1 (résistance)</option>
+            </select>
+            
+            <div id="inputVin">
+                <label for="vin">Tension d'entrée Vin (V) :</label>
+                <input type="number" id="vin" placeholder="Ex: 12" min="0" step="any">
+            </div>
+            
+            <div id="inputR1">
+                <label for="r1">Résistance R1 (Ω) :</label>
+                <input type="number" id="r1" placeholder="Ex: 10000" min="0" step="any">
+            </div>
+            
+            <div id="inputR2">
+                <label for="r2">Résistance R2 (Ω) :</label>
+                <input type="number" id="r2" placeholder="Ex: 10000" min="0" step="any">
+            </div>
+            
+            <div id="inputVout" style="display: none;">
+                <label for="vout">Tension de sortie Vout (V) :</label>
+                <input type="number" id="vout" placeholder="Ex: 5" min="0" step="any">
+            </div>
+            
+            <button type="button" class="button" id="calculate">Calculer</button>
+        </div>
+        
+        <div id="output" style="display: none;">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('mode').addEventListener('change', function() {
+            const mode = this.value;
+            document.getElementById('inputVout').style.display = mode === 'vout' ? 'none' : 'block';
+            document.getElementById('inputR1').style.display = mode === 'r1' ? 'none' : 'block';
+            document.getElementById('inputR2').style.display = mode === 'r2' ? 'none' : 'block';
+        });
+
+        document.getElementById('calculate').addEventListener('click', function() {
+            const mode = document.getElementById('mode').value;
+            const vin = parseFloat(document.getElementById('vin').value);
+            const r1 = parseFloat(document.getElementById('r1').value);
+            const r2 = parseFloat(document.getElementById('r2').value);
+            const vout = parseFloat(document.getElementById('vout').value);
+
+            let result;
+            let resultLabel;
+            let formula;
+            let unit;
+
+            if (mode === 'vout') {
+                if (isNaN(vin) || isNaN(r1) || isNaN(r2)) {
+                    alert('Veuillez remplir tous les champs requis');
+                    return;
+                }
+                if (r1 + r2 === 0) {
+                    alert('La somme R1 + R2 ne peut pas être nulle');
+                    return;
+                }
+                result = vin * (r2 / (r1 + r2));
+                resultLabel = 'Tension de sortie (Vout)';
+                formula = `Vout = ${vin} × (${r2} / (${r1} + ${r2}))`;
+                unit = 'V';
+            } else if (mode === 'r2') {
+                if (isNaN(vin) || isNaN(r1) || isNaN(vout)) {
+                    alert('Veuillez remplir tous les champs requis');
+                    return;
+                }
+                if (vin - vout === 0) {
+                    alert('Vin ne peut pas être égal à Vout');
+                    return;
+                }
+                result = (vout * r1) / (vin - vout);
+                resultLabel = 'Résistance R2';
+                formula = `R2 = (${vout} × ${r1}) / (${vin} - ${vout})`;
+                unit = 'Ω';
+            } else if (mode === 'r1') {
+                if (isNaN(vin) || isNaN(r2) || isNaN(vout)) {
+                    alert('Veuillez remplir tous les champs requis');
+                    return;
+                }
+                if (vout === 0) {
+                    alert('Vout ne peut pas être nul');
+                    return;
+                }
+                result = r2 * ((vin - vout) / vout);
+                resultLabel = 'Résistance R1';
+                formula = `R1 = ${r2} × ((${vin} - ${vout}) / ${vout})`;
+                unit = 'Ω';
+            }
+
+            const output = document.getElementById('output');
+            output.style.display = 'block';
+            output.innerHTML = `
+                <h2>Résultat du calcul</h2>
+                <p><strong>Formule utilisée :</strong> ${formula}</p>
+                <p class="result-value">${resultLabel} : <span class="coppy" onclick="copyToClipboard('${result.toFixed(4)}')">${result.toFixed(4)} ${unit}</span></p>
+                <p><em>Valeur arrondie : <span class="coppy" onclick="copyToClipboard('${Math.round(result)}')">${Math.round(result)} ${unit}</span></em></p>
+            `;
+        });
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Texte copié dans le presse-papier');
+        }
+    </script>
+</body>
+</html>

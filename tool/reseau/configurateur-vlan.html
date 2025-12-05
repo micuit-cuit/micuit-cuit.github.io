@@ -111,7 +111,7 @@
 </head>
 <body>
     <div class="container">
-        <a href="/tool/reseau/index.html">retour au outils réseau</a>
+        <a href="/tool/reseau/index.html">Retour aux outils réseau</a>
         <h1>Configurateur de VLAN</h1>
         <label for="marque" id="labelMarque" >Marque de l'équipement :</label>
         <select id="marque" name="marque">
@@ -131,7 +131,7 @@
         <div id="vlanDiv">
   
         </div>
-        <button class="button" id="addVlan">ajouter un nouvaux vlan</button>
+        <button class="button" id="addVlan">Ajouter un nouveau VLAN</button>
         <button class="button" id="generate">Générer la commande</button>
 
         <code class="output" id="commandOutput"><div id="ctrlC"><button onclick="copyToClipboard()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M384 336l-192 0c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l140.1 0L400 115.9 400 320c0 8.8-7.2 16-16 16zM192 384l192 0c35.3 0 64-28.7 64-64l0-204.1c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1L192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-32-48 0 0 32c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l32 0 0-48-32 0z"/></svg>Copier la commande</button></div> 
@@ -247,7 +247,7 @@ ${marque === "Cisco" ? "exit \nconfigure terminal" : ""}
         commande += `
 exit
 ${marque === "Cisco" ? "(write memory)" : "write memory"}
-${marque === "Cisco" ? "" : "# ATTENTION : Les commandes ici n'on pas été testées sur un équipement HP, merci de faire des retours si il y a des erreurs."}
+${marque === "Cisco" ? "" : "# ATTENTION : Les commandes ici n'ont pas été testées sur un équipement HP, merci de faire des retours s'il y a des erreurs."}
 `;
 
         console.log(commande);
@@ -285,7 +285,7 @@ ${marque === "Cisco" ? "" : "# ATTENTION : Les commandes ici n'on pas été test
                 <div id="vlanNatif-${vlanID.length}" style="display: none;">
                     <label for="natif-${vlanID.length}">VLAN natif :</label>
                     <input type="number" id="natif-${vlanID.length}" name="natif">
-                    <label for="allowedVlan-${vlanID.length}">VLAN autorisés (laissé vide pour tous, mettre les id des vlan séparé par des virgules) :</label>
+                    <label for="allowedVlan-${vlanID.length}">VLAN autorisés (laissez vide pour tous, mettez les ID des VLAN séparés par des virgules) :</label>
                     <input type="text" id="allowedVlan-${vlanID.length}" name="allowedVlan">
                 </div>      
                 <div>
