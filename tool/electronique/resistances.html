@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/lib/alert.js"></script>
+    <title>Calculateur de résistances</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form {
+            display: flex;
+            flex-direction: column;
+            border: black 1px solid;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 15px;
+        }
+        label {
+            margin: 10px 0 5px;
+            color: #555;
+        }
+        input, select {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button.remove {
+            background-color: #dc3545;
+        }
+        .button.remove:hover {
+            background-color: #bd2130;
+        }
+        a {
+            color: #333;
+            font-weight: bold;
+        }
+        #output {
+            margin: 20px 10px;
+            padding: 15px;
+            background-color: #e8f4e8;
+            border-radius: 10px;
+            border: 1px solid #4CAF50;
+        }
+        .resistances-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .resistance-item {
+            display: flex;
+            align-items: center;
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .resistance-item button {
+            margin-left: 10px;
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        span.coppy {
+            font-weight: bold;
+            border: 1px solid #383838;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+        span.coppy:hover:before {
+            content: 'Copier';
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            margin-left: 10px;
+            top: -30px;
+            z-index: 10000;
+        }
+        .result-value {
+            font-size: 1.5em;
+            color: #007BFF;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/tool/electronique/index.html">Retour aux outils électronique</a>
+        <h1>Calculateur de résistances</h1>
+        
+        <div class="form">
+            <label for="type">Type de montage :</label>
+            <select id="type" name="type">
+                <option value="serie">Résistances en série</option>
+                <option value="parallele">Résistances en parallèle</option>
+            </select>
+            
+            <label for="resistance">Ajouter une résistance (Ω) :</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="number" id="resistance" placeholder="Ex: 1000" min="0" step="any">
+                <button type="button" class="button" id="addResistance">Ajouter</button>
+            </div>
+            
+            <label>Résistances ajoutées :</label>
+            <div id="resistancesList" class="resistances-list">
+                <em>Aucune résistance ajoutée</em>
+            </div>
+            
+            <button type="button" class="button" id="calculate">Calculer</button>
+        </div>
+        
+        <div id="output" style="display: none;">
+        </div>
+    </div>
+
+    <script>
+        let resistances = [];
+
+        function updateResistancesList() {
+            const list = document.getElementById('resistancesList');
+            if (resistances.length === 0) {
+                list.innerHTML = '<em>Aucune résistance ajoutée</em>';
+            } else {
+                list.innerHTML = resistances.map((r, i) => `
+                    <div class="resistance-item">
+                        <span>R${i + 1} = ${r} Ω</span>
+                        <button onclick="removeResistance(${i})">✕</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function removeResistance(index) {
+            resistances.splice(index, 1);
+            updateResistancesList();
+        }
+
+        document.getElementById('addResistance').addEventListener('click', function() {
+            const input = document.getElementById('resistance');
+            const value = parseFloat(input.value);
+            
+            if (isNaN(value) || value < 0) {
+                alert('Veuillez entrer une valeur de résistance valide');
+                return;
+            }
+            
+            resistances.push(value);
+            updateResistancesList();
+            input.value = '';
+            input.focus();
+        });
+
+        document.getElementById('resistance').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('addResistance').click();
+            }
+        });
+
+        document.getElementById('calculate').addEventListener('click', function() {
+            if (resistances.length < 2) {
+                alert('Veuillez ajouter au moins 2 résistances');
+                return;
+            }
+
+            const type = document.getElementById('type').value;
+            let result;
+            let formula;
+            let explanation;
+
+            if (type === 'serie') {
+                result = resistances.reduce((sum, r) => sum + r, 0);
+                formula = resistances.map((r, i) => `R${i + 1}`).join(' + ');
+                explanation = `En série : Req = ${resistances.join(' + ')} = ${result} Ω`;
+            } else {
+                const inverseSum = resistances.reduce((sum, r) => sum + (1 / r), 0);
+                result = 1 / inverseSum;
+                formula = '1 / (' + resistances.map((r, i) => `1/R${i + 1}`).join(' + ') + ')';
+                explanation = `En parallèle : 1/Req = ${resistances.map(r => `1/${r}`).join(' + ')} = ${inverseSum.toFixed(6)}`;
+            }
+
+            const output = document.getElementById('output');
+            output.style.display = 'block';
+            output.innerHTML = `
+                <h2>Résultat du calcul</h2>
+                <p><strong>Type de montage :</strong> ${type === 'serie' ? 'Série' : 'Parallèle'}</p>
+                <p><strong>Formule :</strong> Req = ${formula}</p>
+                <p>${explanation}</p>
+                <p class="result-value">Résistance équivalente : <span class="coppy" onclick="copyToClipboard('${result.toFixed(4)}')">${result.toFixed(4)} Ω</span></p>
+                <p><em>Valeur arrondie : <span class="coppy" onclick="copyToClipboard('${Math.round(result)}')">${Math.round(result)} Ω</span></em></p>
+            `;
+        });
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Texte copié dans le presse-papier');
+        }
+    </script>
+</body>
+</html>

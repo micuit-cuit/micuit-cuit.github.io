@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/lib/alert.js"></script>
+    <title>Pont diviseur de courant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form {
+            display: flex;
+            flex-direction: column;
+            border: black 1px solid;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 15px;
+        }
+        label {
+            margin: 10px 0 5px;
+            color: #555;
+        }
+        input, select {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            color: #333;
+            font-weight: bold;
+        }
+        #output {
+            margin: 20px 10px;
+            padding: 15px;
+            background-color: #e8f4e8;
+            border-radius: 10px;
+            border: 1px solid #4CAF50;
+        }
+        span.coppy {
+            font-weight: bold;
+            border: 1px solid #383838;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+        span.coppy:hover:before {
+            content: 'Copier';
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            margin-left: 10px;
+            top: -30px;
+            z-index: 10000;
+        }
+        .result-value {
+            font-size: 1.5em;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .schema {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+        .schema pre {
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .info {
+            background-color: #e7f3ff;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/tool/electronique/index.html">Retour aux outils électronique</a>
+        <h1>Pont diviseur de courant</h1>
+        
+        <div class="info">
+            <strong>Formule :</strong> I1 = Itotal × (R2 / (R1 + R2)) et I2 = Itotal × (R1 / (R1 + R2))
+            <br><br>
+            <em>Note : Dans un diviseur de courant avec deux résistances en parallèle, le courant se divise inversement proportionnel aux résistances.</em>
+        </div>
+
+        <div class="schema">
+            <pre>
+           Itotal
+              │
+              ├──── R1 ──── I1
+              │
+              └──── R2 ──── I2
+            </pre>
+        </div>
+        
+        <div class="form">
+            <label for="mode">Mode de calcul :</label>
+            <select id="mode" name="mode">
+                <option value="currents">Calculer les courants I1 et I2</option>
+                <option value="itotal">Calculer le courant total</option>
+            </select>
+            
+            <div id="inputItotal">
+                <label for="itotal">Courant total Itotal (A) :</label>
+                <input type="number" id="itotal" placeholder="Ex: 0.5" min="0" step="any">
+            </div>
+            
+            <div id="inputR1">
+                <label for="r1">Résistance R1 (Ω) :</label>
+                <input type="number" id="r1" placeholder="Ex: 100" min="0" step="any">
+            </div>
+            
+            <div id="inputR2">
+                <label for="r2">Résistance R2 (Ω) :</label>
+                <input type="number" id="r2" placeholder="Ex: 200" min="0" step="any">
+            </div>
+            
+            <div id="inputI1" style="display: none;">
+                <label for="i1">Courant I1 (A) :</label>
+                <input type="number" id="i1" placeholder="Ex: 0.25" min="0" step="any">
+            </div>
+            
+            <button type="button" class="button" id="calculate">Calculer</button>
+        </div>
+        
+        <div id="output" style="display: none;">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('mode').addEventListener('change', function() {
+            const mode = this.value;
+            document.getElementById('inputItotal').style.display = mode === 'currents' ? 'block' : 'none';
+            document.getElementById('inputI1').style.display = mode === 'itotal' ? 'block' : 'none';
+        });
+
+        document.getElementById('calculate').addEventListener('click', function() {
+            const mode = document.getElementById('mode').value;
+            const itotal = parseFloat(document.getElementById('itotal').value);
+            const r1 = parseFloat(document.getElementById('r1').value);
+            const r2 = parseFloat(document.getElementById('r2').value);
+            const i1Input = parseFloat(document.getElementById('i1').value);
+
+            const output = document.getElementById('output');
+
+            if (mode === 'currents') {
+                if (isNaN(itotal) || isNaN(r1) || isNaN(r2)) {
+                    alert('Veuillez remplir tous les champs requis');
+                    return;
+                }
+                if (r1 + r2 === 0) {
+                    alert('La somme R1 + R2 ne peut pas être nulle');
+                    return;
+                }
+
+                const i1 = itotal * (r2 / (r1 + r2));
+                const i2 = itotal * (r1 / (r1 + r2));
+
+                output.style.display = 'block';
+                output.innerHTML = `
+                    <h2>Résultat du calcul</h2>
+                    <p><strong>Formule utilisée :</strong></p>
+                    <p>I1 = ${itotal} × (${r2} / (${r1} + ${r2})) = ${i1.toFixed(6)} A</p>
+                    <p>I2 = ${itotal} × (${r1} / (${r1} + ${r2})) = ${i2.toFixed(6)} A</p>
+                    <hr>
+                    <p class="result-value">Courant I1 : <span class="coppy" onclick="copyToClipboard('${i1.toFixed(6)}')">${i1.toFixed(6)} A</span> (${(i1 * 1000).toFixed(3)} mA)</p>
+                    <p class="result-value">Courant I2 : <span class="coppy" onclick="copyToClipboard('${i2.toFixed(6)}')">${i2.toFixed(6)} A</span> (${(i2 * 1000).toFixed(3)} mA)</p>
+                    <hr>
+                    <p><strong>Vérification :</strong> I1 + I2 = ${(i1 + i2).toFixed(6)} A (doit être égal à Itotal = ${itotal} A)</p>
+                `;
+            } else if (mode === 'itotal') {
+                if (isNaN(i1Input) || isNaN(r1) || isNaN(r2)) {
+                    alert('Veuillez remplir tous les champs requis');
+                    return;
+                }
+                if (r2 === 0) {
+                    alert('R2 ne peut pas être nul');
+                    return;
+                }
+
+                const itotalResult = i1Input * (r1 + r2) / r2;
+                const i2 = itotalResult - i1Input;
+
+                output.style.display = 'block';
+                output.innerHTML = `
+                    <h2>Résultat du calcul</h2>
+                    <p><strong>Formule utilisée :</strong></p>
+                    <p>Itotal = I1 × (R1 + R2) / R2 = ${i1Input} × (${r1} + ${r2}) / ${r2}</p>
+                    <hr>
+                    <p class="result-value">Courant total : <span class="coppy" onclick="copyToClipboard('${itotalResult.toFixed(6)}')">${itotalResult.toFixed(6)} A</span> (${(itotalResult * 1000).toFixed(3)} mA)</p>
+                    <p class="result-value">Courant I2 : <span class="coppy" onclick="copyToClipboard('${i2.toFixed(6)}')">${i2.toFixed(6)} A</span> (${(i2 * 1000).toFixed(3)} mA)</p>
+                `;
+            }
+        });
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Texte copié dans le presse-papier');
+        }
+    </script>
+</body>
+</html>

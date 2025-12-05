@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="/js/lib/alert.js"></script>
 
-    <title>createur de sous-reseaux</title>
+    <title>Créateur de sous-réseaux</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -150,13 +150,15 @@
 </head>
 <body>
     <div class="container">
-        <a href="/tool/reseau/index.html">retour au outils réseau</a>
+        <a href="/tool/reseau/index.html">Retour aux outils réseau</a>
         <h1>Créateur de sous-réseaux</h1>
         <div class="form">
             <label for="ip">Adresse IP et le masque</label>
             <input type="text" name="ip" id="ip" placeholder="10.0.0.1/8" required value="10.0.0.1/8">
             <label for="nb">Nombre de sous-réseaux</label>
             <input type="number" name="nb" id="nb" min="1" max="28" required value="2">
+            <label for="nbMachines">Nombre de machines demandé par sous-réseau (optionnel)</label>
+            <input type="number" name="nbMachines" id="nbMachines" min="1" placeholder="Ex: 50">
             <button type="button" class="button" id="create">Créer</button>
         </div>
         <div id="output">
@@ -172,9 +174,10 @@
         subnets = [];
         let ipPart = document.getElementById('ip').value;
         let nb = document.getElementById('nb').value;
-        console.log(ipPart, nb);
-        //verifie l'entrée utilisateur
-        if (!ipPart) {sousReseauEasy
+        let nbMachines = document.getElementById('nbMachines').value;
+        console.log(ipPart, nb, nbMachines);
+        //vérifie l'entrée utilisateur
+        if (!ipPart) {
             alert('Veuillez entrer une adresse IP et un masque (ex: 10.0.0.1/8)');
             return;
         }
@@ -274,19 +277,34 @@
         }
         console.log(subnets);
         //affiche les sous-réseaux dans le html
-        //conevrte le masque en adresse IP
+        //convertit le masque en adresse IP
         let maskSubnetIP = ""
         for (let i = 0; i < 4; i++) {
             maskSubnetIP += parseInt(maskSubnet / 8) > i ? '255' : parseInt(maskSubnet / 8) === i ? (255 << (8 - maskSubnet % 8)) & 255 : '0';
             maskSubnetIP += i < 3 ? '.' : '';
         }
+        //calcul du nombre maximum de machines par sous-réseau
+        const maxMachines = Math.pow(2, 32 - maskSubnet) - 2;
+        
+        let machinesInfo = '';
+        if (nbMachines && parseInt(nbMachines) > 0) {
+            const demandedMachines = parseInt(nbMachines);
+            if (demandedMachines > maxMachines) {
+                machinesInfo = `<p style="color: red;">⚠️ Attention : Vous demandez ${demandedMachines} machines mais le maximum possible est de ${maxMachines} machines par sous-réseau !</p>`;
+            } else {
+                machinesInfo = `<p style="color: green;">✓ ${demandedMachines} machines demandées / ${maxMachines} machines maximum disponibles</p>`;
+            }
+        }
+        
         let html = `
-                <p>Adresse IP: <span class="coppy" onclick="copyToClipboard('${ipPart}')">${ipPart}</span></p>
-                <p>Nombre de sous-réseaux: <span class="coppy" onclick="copyToClipboard('${nb}')">${nb}</span></p>
-                <p>Nouveau masque: <span class="coppy" onclick="copyToClipboard('${maskSubnet}')">${maskSubnet}</span> <span class="coppy" onclick="copyToClipboard('${maskSubnetIP}')">(${maskSubnetIP})</span></p>
-                <p>Sous-réseaux créés:</p>
+                <p>Adresse IP : <span class="coppy" onclick="copyToClipboard('${ipPart}')">${ipPart}</span></p>
+                <p>Nombre de sous-réseaux : <span class="coppy" onclick="copyToClipboard('${nb}')">${nb}</span></p>
+                <p>Nouveau masque : <span class="coppy" onclick="copyToClipboard('${maskSubnet}')">${maskSubnet}</span> <span class="coppy" onclick="copyToClipboard('${maskSubnetIP}')">(${maskSubnetIP})</span></p>
+                <p>Nombre maximum de machines par sous-réseau : <span class="coppy" onclick="copyToClipboard('${maxMachines}')">${maxMachines}</span></p>
+                ${machinesInfo}
+                <p>Sous-réseaux créés :</p>
         `;
-        function displaySubnet(subnet, i) {
+        function displaySubnet(subnet, i, maxMachines) {
             return `
             <input type="checkbox" id="subReseau${i}" class="concealedInput" style="display: none">
             <div class="subReseau">
@@ -294,16 +312,17 @@
                     <h2><span class="numSubnet">${i + 1}</span> ${subnet.reseau}</h2>
                 </label>
                 <div class="contentSubReseau">
-                    <p>Adresse réseau: <span class="reseau coppy" onclick="copyToClipboard('${subnet.reseau}')">${subnet.reseau}</span></p>
-                    <p>Adresse 1er hôte: <span class="hote coppy" onclick="copyToClipboard('${subnet.hote}')">${subnet.hote}</span></p>
-                    <p>Adresse dernier hôte: <span class="fin coppy" onclick="copyToClipboard('${subnet.fin}')">${subnet.fin}</span></p>
-                    <p>Adresse de broadcast: <span class="diffusion coppy" onclick="copyToClipboard('${subnet.diffusion}')">${subnet.diffusion}</span></p>
+                    <p>Adresse réseau : <span class="reseau coppy" onclick="copyToClipboard('${subnet.reseau}')">${subnet.reseau}</span></p>
+                    <p>Adresse 1er hôte : <span class="hote coppy" onclick="copyToClipboard('${subnet.hote}')">${subnet.hote}</span></p>
+                    <p>Adresse dernier hôte : <span class="fin coppy" onclick="copyToClipboard('${subnet.fin}')">${subnet.fin}</span></p>
+                    <p>Adresse de broadcast : <span class="diffusion coppy" onclick="copyToClipboard('${subnet.diffusion}')">${subnet.diffusion}</span></p>
+                    <p>Nombre maximum de machines : <span class="coppy" onclick="copyToClipboard('${maxMachines}')">${maxMachines}</span></p>
                 </div>
             </div>
             `
         }
         for (let i = 0; i < subnets.length; i++) {
-            html += displaySubnet(subnets[i], i);
+            html += displaySubnet(subnets[i], i, maxMachines);
         }
         html += `
         <h1><span class="coppy" onclick="copyToClipboard('JSONDATA')">Copier au format JSON</span></h1>
