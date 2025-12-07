@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/lib/alert.js"></script>
+    <title>Modèle équivalent de Norton</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form {
+            display: flex;
+            flex-direction: column;
+            border: black 1px solid;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 15px;
+        }
+        label {
+            margin: 10px 0 5px;
+            color: #555;
+        }
+        input, select {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            color: #333;
+            font-weight: bold;
+        }
+        #output {
+            margin: 20px 10px;
+            padding: 15px;
+            background-color: #e8f4e8;
+            border-radius: 10px;
+            border: 1px solid #4CAF50;
+        }
+        span.coppy {
+            font-weight: bold;
+            border: 1px solid #383838;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+        span.coppy:hover:before {
+            content: 'Copier';
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            margin-left: 10px;
+            top: -30px;
+            z-index: 10000;
+        }
+        .result-value {
+            font-size: 1.5em;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .schema {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+        .schema pre {
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .info {
+            background-color: #e7f3ff;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .conversion {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/tool/electronique/index.html">Retour aux outils électroniques</a>
+        <h1>Modèle équivalent de Norton</h1>
+        
+        <div class="info">
+            <strong>Principe :</strong> Le théorème de Norton permet de simplifier un circuit linéaire complexe en un circuit équivalent composé d'une source de courant (In) en parallèle avec une résistance (Rn).
+            <br><br>
+            <strong>Formules :</strong>
+            <ul>
+                <li>In = Courant de court-circuit entre les bornes A et B</li>
+                <li>Rn = Résistance vue des bornes A et B (sources éteintes)</li>
+            </ul>
+        </div>
+
+        <div class="conversion">
+            <strong>Conversion Thévenin ↔ Norton :</strong>
+            <ul>
+                <li>In = Vth / Rth</li>
+                <li>Rn = Rth</li>
+                <li>Vth = In × Rn</li>
+            </ul>
+        </div>
+
+        <div class="schema">
+            <pre>
+Circuit original          Circuit équivalent de Norton
+    
+  ┌─────────┐                      A
+  │ Circuit │                      │
+  │ Complexe│        =>         In ═╪═ Rn
+  │         │                      │
+  └─────────┘                      B
+     A    B                           
+            </pre>
+        </div>
+        
+        <div class="form">
+            <label for="mode">Mode de calcul :</label>
+            <select id="mode" name="mode">
+                <option value="basic">Calcul basique (In et Rn connus)</option>
+                <option value="from_thevenin">Conversion depuis Thévenin</option>
+                <option value="parallel">Circuit avec résistances en parallèle</option>
+            </select>
+            
+            <div id="inputBasic">
+                <label for="in">Courant de Norton In (A) :</label>
+                <input type="number" id="in" placeholder="Ex: 0.12" step="any">
+                
+                <label for="rn">Résistance de Norton Rn (Ω) :</label>
+                <input type="number" id="rn" placeholder="Ex: 100" min="0" step="any">
+                
+                <label for="rload">Résistance de charge RL (Ω) :</label>
+                <input type="number" id="rload" placeholder="Ex: 50" min="0" step="any">
+            </div>
+            
+            <div id="inputThevenin" style="display: none;">
+                <label for="vth">Tension de Thévenin Vth (V) :</label>
+                <input type="number" id="vth" placeholder="Ex: 12" step="any">
+                
+                <label for="rth">Résistance de Thévenin Rth (Ω) :</label>
+                <input type="number" id="rth" placeholder="Ex: 100" min="0" step="any">
+                
+                <label for="rload2">Résistance de charge RL (Ω) :</label>
+                <input type="number" id="rload2" placeholder="Ex: 50" min="0" step="any">
+            </div>
+            
+            <div id="inputParallel" style="display: none;">
+                <label for="isource">Courant de source (A) :</label>
+                <input type="number" id="isource" placeholder="Ex: 0.5" step="any">
+                
+                <label for="r1">Résistance R1 (Ω) :</label>
+                <input type="number" id="r1" placeholder="Ex: 100" min="0" step="any">
+                
+                <label for="r2">Résistance R2 (Ω) :</label>
+                <input type="number" id="r2" placeholder="Ex: 100" min="0" step="any">
+                
+                <label for="rload3">Résistance de charge RL (Ω) :</label>
+                <input type="number" id="rload3" placeholder="Ex: 50" min="0" step="any">
+            </div>
+            
+            <button type="button" class="button" id="calculate">Calculer</button>
+        </div>
+        
+        <div id="output" style="display: none;">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('mode').addEventListener('change', function() {
+            const mode = this.value;
+            document.getElementById('inputBasic').style.display = mode === 'basic' ? 'block' : 'none';
+            document.getElementById('inputThevenin').style.display = mode === 'from_thevenin' ? 'block' : 'none';
+            document.getElementById('inputParallel').style.display = mode === 'parallel' ? 'block' : 'none';
+        });
+
+        document.getElementById('calculate').addEventListener('click', function() {
+            const mode = document.getElementById('mode').value;
+            let in_norton, rn, rload, current, vload, power;
+            let explanation = '';
+
+            if (mode === 'basic') {
+                in_norton = parseFloat(document.getElementById('in').value);
+                rn = parseFloat(document.getElementById('rn').value);
+                rload = parseFloat(document.getElementById('rload').value);
+                
+                if (isNaN(in_norton) || isNaN(rn) || isNaN(rload)) {
+                    alert('Veuillez remplir tous les champs requis');
+                    return;
+                }
+                
+                explanation = `<h3>Circuit équivalent de Norton</h3>
+                    <p>In = ${in_norton} A</p>
+                    <p>Rn = ${rn} Ω</p>`;
+                
+            } else if (mode === 'from_thevenin') {
+                const vth = parseFloat(document.getElementById('vth').value);
+                const rth = parseFloat(document.getElementById('rth').value);
+                rload = parseFloat(document.getElementById('rload2').value);
+                
+                if (isNaN(vth) || isNaN(rth) || isNaN(rload)) {
+                    alert('Veuillez remplir tous les champs requis');
+                    return;
+                }
+                
+                if (rth === 0) {
+                    alert('Rth ne peut pas être nul');
+                    return;
+                }
+                
+                // Conversion Thévenin vers Norton
+                in_norton = vth / rth;
+                rn = rth;
+                
+                explanation = `<h3>Conversion de Thévenin vers Norton</h3>
+                    <p>Valeurs de Thévenin :</p>
+                    <ul>
+                        <li>Vth = ${vth} V</li>
+                        <li>Rth = ${rth} Ω</li>
+                    </ul>
+                    <p>Valeurs de Norton équivalentes :</p>
+                    <ul>
+                        <li>In = Vth / Rth = ${vth} / ${rth} = ${in_norton.toFixed(6)} A</li>
+                        <li>Rn = Rth = ${rn} Ω</li>
+                    </ul>`;
+                
+            } else if (mode === 'parallel') {
+                const isource = parseFloat(document.getElementById('isource').value);
+                const r1 = parseFloat(document.getElementById('r1').value);
+                const r2 = parseFloat(document.getElementById('r2').value);
+                rload = parseFloat(document.getElementById('rload3').value);
+                
+                if (isNaN(isource) || isNaN(r1) || isNaN(r2) || isNaN(rload)) {
+                    alert('Veuillez remplir tous les champs requis');
+                    return;
+                }
+                
+                // Pour résistances en parallèle
+                rn = (r1 * r2) / (r1 + r2);
+                in_norton = isource; // Courant de court-circuit
+                
+                explanation = `<h3>Calcul du circuit équivalent de Norton</h3>
+                    <p>Résistances R1 et R2 en parallèle</p>
+                    <p>Rn = (R1 × R2) / (R1 + R2) = (${r1} × ${r2}) / (${r1} + ${r2}) = ${rn.toFixed(4)} Ω</p>
+                    <p>In = ${in_norton} A (courant de source)</p>`;
+            }
+
+            // Calcul du courant, tension et puissance sur la charge
+            // Pour Norton: le courant se divise entre Rn et Rload
+            const rparallel = (rn * rload) / (rn + rload);
+            current = in_norton * (rn / (rn + rload)); // Diviseur de courant
+            vload = current * rload;
+            power = current * current * rload;
+
+            const output = document.getElementById('output');
+            output.style.display = 'block';
+            output.innerHTML = `
+                <h2>Résultat du calcul</h2>
+                ${explanation}
+                <hr>
+                <h3>Paramètres de la charge</h3>
+                <p><strong>Résistance de charge :</strong> ${rload} Ω</p>
+                <p class="result-value">Courant dans la charge : <span class="coppy" onclick="copyToClipboard('${current.toFixed(6)}')">${current.toFixed(6)} A</span></p>
+                <p class="result-value">Tension aux bornes de la charge : <span class="coppy" onclick="copyToClipboard('${vload.toFixed(4)}')">${vload.toFixed(4)} V</span></p>
+                <p class="result-value">Puissance dissipée : <span class="coppy" onclick="copyToClipboard('${power.toFixed(6)}')">${power.toFixed(6)} W</span></p>
+                <hr>
+                <p><em>Note : Le théorème de Norton est équivalent au théorème de Thévenin et est particulièrement utile pour l'analyse des circuits avec des sources de courant.</em></p>
+            `;
+        });
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Texte copié dans le presse-papier');
+        }
+    </script>
+</body>
+</html>
