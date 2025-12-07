@@ -155,10 +155,28 @@
         <div class="form">
             <label for="ip">Adresse IP et le masque</label>
             <input type="text" name="ip" id="ip" placeholder="10.0.0.1/8" required value="10.0.0.1/8">
-            <label for="nb">Nombre de sous-réseaux</label>
-            <input type="number" name="nb" id="nb" min="1" max="28" required value="2">
-            <label for="nbMachines">Nombre de machines demandé par sous-réseau (optionnel)</label>
-            <input type="number" name="nbMachines" id="nbMachines" min="1" placeholder="Ex: 50">
+            
+            <div style="margin: 10px; display: flex; gap: 20px;">
+                <label style="margin: 0; cursor: pointer;">
+                    <input type="radio" name="mode" id="modeSubnets" value="subnets" checked>
+                    Nombre de sous-réseaux
+                </label>
+                <label style="margin: 0; cursor: pointer;">
+                    <input type="radio" name="mode" id="modeMachines" value="machines">
+                    Nombre de machines par sous-réseau
+                </label>
+            </div>
+            
+            <div id="subnetInputGroup">
+                <label for="nb">Nombre de sous-réseaux</label>
+                <input type="number" name="nb" id="nb" min="1" max="28" required value="2">
+            </div>
+            
+            <div id="machinesInputGroup" style="display: none;">
+                <label for="nbMachines">Nombre de machines par sous-réseau</label>
+                <input type="number" name="nbMachines" id="nbMachines" min="1" placeholder="Ex: 50">
+            </div>
+            
             <button type="button" class="button" id="create">Créer</button>
         </div>
         <div id="output">
@@ -170,30 +188,36 @@
     //parcours des éléments du formulaire
     let subnets = [];
 
+    // Gestion du changement de mode
+    document.querySelectorAll('input[name="mode"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const subnetGroup = document.getElementById('subnetInputGroup');
+            const machinesGroup = document.getElementById('machinesInputGroup');
+            
+            if (this.value === 'subnets') {
+                subnetGroup.style.display = 'block';
+                machinesGroup.style.display = 'none';
+            } else {
+                subnetGroup.style.display = 'none';
+                machinesGroup.style.display = 'block';
+            }
+        });
+    });
+
     document.querySelector('#create').addEventListener('click', function() {
         subnets = [];
         let ipPart = document.getElementById('ip').value;
         let nb = document.getElementById('nb').value;
         let nbMachines = document.getElementById('nbMachines').value;
-        console.log(ipPart, nb, nbMachines);
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        
+        console.log(ipPart, nb, nbMachines, mode);
         //vérifie l'entrée utilisateur
         if (!ipPart) {
             alert('Veuillez entrer une adresse IP et un masque (ex: 10.0.0.1/8)');
             return;
         }
-        if (!nb) {
-            alert('Veuillez entrer un nombre de sous-réseaux');
-            return;
-        }
-        if (isNaN(nb)) {
-            alert('Le nombre de sous-réseaux doit être un nombre');
-            return;
-        }
-        nb = parseInt(nb);
-        if (nb < 1) {
-            alert('Le nombre de sous-réseaux doit être supérieur à 0');
-            return;
-        }
+        
         if (!ipPart.includes('/') || !ipPart.split(' ')) {
             alert('Veuillez entrer une adresse IP et un masque valide (ex: 10.0.0.1/8)');
             return;
@@ -230,14 +254,87 @@
                 return;
             }
         }
-        //calcul du nombre de bits pour les sous-réseaux
-        const nbBitsSB = Math.ceil(Math.log2(nb));
-        console.log(nbBitsSB);
-        //verifie si il y a assez de bits pour le nombre de sous-réseaux
-        if (mask + nbBitsSB > 32) {
-            alert('Pas assez de bits pour le nombre de sous-réseaux');
-            return;
+        
+        let nbBitsSB;
+        let machinesInfo = '';
+        let totalSubnetsForDisplay = 0;
+        
+        if (mode === 'machines') {
+            // Mode: nombre de machines par sous-réseau
+            if (!nbMachines) {
+                alert('Veuillez entrer un nombre de machines par sous-réseau');
+                return;
+            }
+            if (isNaN(nbMachines)) {
+                alert('Le nombre de machines doit être un nombre');
+                return;
+            }
+            nbMachines = parseInt(nbMachines);
+            if (nbMachines < 1) {
+                alert('Le nombre de machines doit être supérieur à 0');
+                return;
+            }
+            
+            // Calcul des bits nécessaires pour les hôtes (+2 pour adresse réseau et broadcast)
+            const nbBitsHotes = Math.ceil(Math.log2(nbMachines + 2));
+            
+            // Vérifier si c'est possible
+            if (mask + nbBitsHotes > 32) {
+                alert('Pas assez de bits disponibles pour ' + nbMachines + ' machines par sous-réseau');
+                return;
+            }
+            
+            // Bits disponibles pour les sous-réseaux
+            const bitsDisponibles = 32 - mask - nbBitsHotes;
+            
+            if (bitsDisponibles < 0) {
+                alert('Pas assez de bits disponibles pour créer des sous-réseaux avec ' + nbMachines + ' machines');
+                return;
+            }
+            
+            // Nombre maximum de sous-réseaux possibles
+            const totalSubnets = Math.pow(2, bitsDisponibles);
+            totalSubnetsForDisplay = totalSubnets;
+            nbBitsSB = bitsDisponibles;
+            
+            // Limiter l'affichage à 256 sous-réseaux maximum pour éviter les problèmes de performance
+            const maxDisplay = 256;
+            nb = Math.min(totalSubnets, maxDisplay);
+            
+            const maxMachinesParSR = Math.pow(2, nbBitsHotes) - 2;
+            if (totalSubnets > maxDisplay) {
+                machinesInfo = `<p style="color: green;">✓ Mode: ${nbMachines} machines demandées → ${totalSubnets} sous-réseaux possibles (max ${maxMachinesParSR} machines/sous-réseau)</p>
+                <p style="color: orange;">⚠️ Affichage limité aux ${maxDisplay} premiers sous-réseaux pour des raisons de performance</p>`;
+            } else {
+                machinesInfo = `<p style="color: green;">✓ Mode: ${nbMachines} machines demandées → ${totalSubnets} sous-réseaux possibles (max ${maxMachinesParSR} machines/sous-réseau)</p>`;
+            }
+            
+        } else {
+            // Mode: nombre de sous-réseaux
+            if (!nb) {
+                alert('Veuillez entrer un nombre de sous-réseaux');
+                return;
+            }
+            if (isNaN(nb)) {
+                alert('Le nombre de sous-réseaux doit être un nombre');
+                return;
+            }
+            nb = parseInt(nb);
+            if (nb < 1) {
+                alert('Le nombre de sous-réseaux doit être supérieur à 0');
+                return;
+            }
+            
+            //calcul du nombre de bits pour les sous-réseaux
+            nbBitsSB = Math.ceil(Math.log2(nb));
+            console.log(nbBitsSB);
+            //verifie si il y a assez de bits pour le nombre de sous-réseaux
+            if (mask + nbBitsSB > 32) {
+                alert('Pas assez de bits pour le nombre de sous-réseaux');
+                return;
+            }
         }
+        
         //calcul du masque de sous-réseaux
         const maskSubnet = mask + nbBitsSB;
         console.log("/"+maskSubnet);
@@ -286,19 +383,12 @@
         //calcul du nombre maximum de machines par sous-réseau
         const maxMachines = Math.pow(2, 32 - maskSubnet) - 2;
         
-        let machinesInfo = '';
-        if (nbMachines && parseInt(nbMachines) > 0) {
-            const demandedMachines = parseInt(nbMachines);
-            if (demandedMachines > maxMachines) {
-                machinesInfo = `<p style="color: red;">⚠️ Attention : Vous demandez ${demandedMachines} machines mais le maximum possible est de ${maxMachines} machines par sous-réseau !</p>`;
-            } else {
-                machinesInfo = `<p style="color: green;">✓ ${demandedMachines} machines demandées / ${maxMachines} machines maximum disponibles</p>`;
-            }
-        }
+        // Afficher le nombre total de sous-réseaux (ou la version limitée en mode machines)
+        const displayNb = totalSubnetsForDisplay > 0 ? totalSubnetsForDisplay : nb;
         
         let html = `
                 <p>Adresse IP : <span class="coppy" onclick="copyToClipboard('${ipPart}')">${ipPart}</span></p>
-                <p>Nombre de sous-réseaux : <span class="coppy" onclick="copyToClipboard('${nb}')">${nb}</span></p>
+                <p>Nombre de sous-réseaux : <span class="coppy" onclick="copyToClipboard('${displayNb}')">${displayNb}</span></p>
                 <p>Nouveau masque : <span class="coppy" onclick="copyToClipboard('${maskSubnet}')">${maskSubnet}</span> <span class="coppy" onclick="copyToClipboard('${maskSubnetIP}')">(${maskSubnetIP})</span></p>
                 <p>Nombre maximum de machines par sous-réseau : <span class="coppy" onclick="copyToClipboard('${maxMachines}')">${maxMachines}</span></p>
                 ${machinesInfo}
