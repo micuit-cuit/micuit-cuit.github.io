@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/lib/alert.js"></script>
+    <title>Calculateur de loi d'Ohm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form {
+            display: flex;
+            flex-direction: column;
+            border: black 1px solid;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 15px;
+        }
+        label {
+            margin: 10px 0 5px;
+            color: #555;
+        }
+        input, select {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            color: #333;
+            font-weight: bold;
+        }
+        #output {
+            margin: 20px 10px;
+            padding: 15px;
+            background-color: #e8f4e8;
+            border-radius: 10px;
+            border: 1px solid #4CAF50;
+        }
+        span.coppy {
+            font-weight: bold;
+            border: 1px solid #383838;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+        span.coppy:hover:before {
+            content: 'Copier';
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            margin-left: 10px;
+            top: -30px;
+            z-index: 10000;
+        }
+        .result-value {
+            font-size: 1.5em;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        .schema {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+        .schema pre {
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .info {
+            background-color: #e7f3ff;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .formulas {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .formulas p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/tool/electronique/index.html">Retour aux outils électroniques</a>
+        <h1>Calculateur de loi d'Ohm</h1>
+        
+        <div class="info">
+            <strong>Loi d'Ohm :</strong> La relation entre tension (V), courant (I) et résistance (R)
+        </div>
+
+        <div class="formulas">
+            <strong>Formules principales :</strong>
+            <p>• V = R × I (Tension = Résistance × Courant)</p>
+            <p>• R = V / I (Résistance = Tension / Courant)</p>
+            <p>• I = V / R (Courant = Tension / Résistance)</p>
+            <p>• P = V × I (Puissance = Tension × Courant)</p>
+        </div>
+
+        <div class="schema">
+            <pre>
+        ┌─────────────┐
+        │             │
+    ────┤      R      ├────
+        │             │
+        └─────────────┘
+        
+    V (Volts)      I (Ampères)
+    R (Ohms)       P (Watts)
+            </pre>
+        </div>
+        
+        <div class="form">
+            <label for="mode">Calculer :</label>
+            <select id="mode" name="mode">
+                <option value="v">Tension (V) - Volts</option>
+                <option value="i">Courant (I) - Ampères</option>
+                <option value="r">Résistance (R) - Ohms</option>
+                <option value="p">Puissance (P) - Watts</option>
+            </select>
+            
+            <div id="inputV">
+                <label for="v">Tension (V) :</label>
+                <input type="number" id="v" placeholder="Ex: 12" min="0" step="any">
+            </div>
+            
+            <div id="inputI">
+                <label for="i">Courant (I) :</label>
+                <input type="number" id="i" placeholder="Ex: 0.5" min="0" step="any">
+            </div>
+            
+            <div id="inputR">
+                <label for="r">Résistance (R) :</label>
+                <input type="number" id="r" placeholder="Ex: 1000" min="0" step="any">
+            </div>
+            
+            <button type="button" class="button" id="calculate">Calculer</button>
+        </div>
+        
+        <div id="output" style="display: none;">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('mode').addEventListener('change', function() {
+            const mode = this.value;
+            // Afficher/masquer les champs selon le mode
+            document.getElementById('inputV').style.display = mode === 'v' ? 'none' : 'block';
+            document.getElementById('inputI').style.display = mode === 'i' ? 'none' : 'block';
+            document.getElementById('inputR').style.display = mode === 'r' ? 'none' : 'block';
+        });
+
+        document.getElementById('calculate').addEventListener('click', function() {
+            const mode = document.getElementById('mode').value;
+            const v = parseFloat(document.getElementById('v').value);
+            const i = parseFloat(document.getElementById('i').value);
+            const r = parseFloat(document.getElementById('r').value);
+
+            let result;
+            let resultLabel;
+            let formula;
+            let unit;
+            let additionalInfo = '';
+
+            if (mode === 'v') {
+                // Calculer V = R × I
+                if (isNaN(r) || isNaN(i)) {
+                    alert('Veuillez remplir tous les champs requis (R et I)');
+                    return;
+                }
+                if (r < 0 || i < 0) {
+                    alert('Les valeurs doivent être positives');
+                    return;
+                }
+                result = r * i;
+                resultLabel = 'Tension (V)';
+                formula = `V = R × I = ${r} × ${i}`;
+                unit = 'V';
+                
+                // Calculer aussi la puissance
+                const power = result * i;
+                additionalInfo = `<p><strong>Puissance :</strong> P = V × I = ${result.toFixed(4)} × ${i} = ${power.toFixed(4)} W</p>`;
+                
+            } else if (mode === 'i') {
+                // Calculer I = V / R
+                if (isNaN(v) || isNaN(r)) {
+                    alert('Veuillez remplir tous les champs requis (V et R)');
+                    return;
+                }
+                if (v < 0 || r < 0) {
+                    alert('Les valeurs doivent être positives');
+                    return;
+                }
+                if (r === 0) {
+                    alert('La résistance ne peut pas être nulle');
+                    return;
+                }
+                result = v / r;
+                resultLabel = 'Courant (I)';
+                formula = `I = V / R = ${v} / ${r}`;
+                unit = 'A';
+                
+                // Calculer aussi la puissance
+                const power = v * result;
+                additionalInfo = `<p><strong>Puissance :</strong> P = V × I = ${v} × ${result.toFixed(4)} = ${power.toFixed(4)} W</p>`;
+                
+            } else if (mode === 'r') {
+                // Calculer R = V / I
+                if (isNaN(v) || isNaN(i)) {
+                    alert('Veuillez remplir tous les champs requis (V et I)');
+                    return;
+                }
+                if (v < 0 || i < 0) {
+                    alert('Les valeurs doivent être positives');
+                    return;
+                }
+                if (i === 0) {
+                    alert('Le courant ne peut pas être nul');
+                    return;
+                }
+                result = v / i;
+                resultLabel = 'Résistance (R)';
+                formula = `R = V / I = ${v} / ${i}`;
+                unit = 'Ω';
+                
+                // Calculer aussi la puissance
+                const power = v * i;
+                additionalInfo = `<p><strong>Puissance :</strong> P = V × I = ${v} × ${i} = ${power.toFixed(4)} W</p>`;
+                
+            } else if (mode === 'p') {
+                // Calculer P = V × I
+                if (isNaN(v) || isNaN(i)) {
+                    alert('Veuillez remplir tous les champs requis (V et I)');
+                    return;
+                }
+                if (v < 0 || i < 0) {
+                    alert('Les valeurs doivent être positives');
+                    return;
+                }
+                result = v * i;
+                resultLabel = 'Puissance (P)';
+                formula = `P = V × I = ${v} × ${i}`;
+                unit = 'W';
+                
+                // Calculer aussi la résistance si possible
+                if (i !== 0) {
+                    const resistance = v / i;
+                    additionalInfo = `<p><strong>Résistance :</strong> R = V / I = ${v} / ${i} = ${resistance.toFixed(4)} Ω</p>`;
+                }
+            }
+
+            const output = document.getElementById('output');
+            output.style.display = 'block';
+            output.innerHTML = `
+                <h2>Résultat du calcul</h2>
+                <p><strong>Formule utilisée :</strong> ${formula}</p>
+                <p class="result-value">${resultLabel} : <span class="coppy" onclick="copyToClipboard('${result.toFixed(4)}')">${result.toFixed(4)} ${unit}</span></p>
+                <p><em>Valeur arrondie : <span class="coppy" onclick="copyToClipboard('${result.toFixed(2)}')">${result.toFixed(2)} ${unit}</span></em></p>
+                ${additionalInfo}
+            `;
+        });
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Texte copié dans le presse-papier');
+        }
+    </script>
+</body>
+</html>
